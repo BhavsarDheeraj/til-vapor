@@ -121,8 +121,8 @@ extension User {
 
 extension User: Validatable {
     static func validations(_ validations: inout Validations) {
-        validations.add("name", as: String, is: .count(3...))
-        validations.add("username", as: String, is: .count(3...))
-        validations.add("password", as: String, is: .count(5...))
+        validations.add("name", as: String.self, is: .count(3...))
+        validations.add("username", as: String.self, is: .count(3...))
+        validations.add("password", as: String.self, is: .count(5...))
     }
 }

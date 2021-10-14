@@ -17,24 +17,31 @@ public func configure(_ app: Application) throws {
     // uncomment to serve files from /Public folder
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
     
-    let databaseName: String
-    let databasePort: Int
     
-    if app.environment == .testing {
-        databaseName = "vapor-test"
-        databasePort = 5433
+    if let url = Environment.get("DATABASE_URL") {
+        try app.databases.use(.postgres(url: url), as: .psql)
     } else {
-        databaseName = "vapor_database"
-        databasePort = 5432
-    }
+        
+        let databaseName: String
+        let databasePort: Int
+        
+        if app.environment == .testing {
+            databaseName = "vapor-test"
+            databasePort = 5433
+        } else {
+            databaseName = "vapor_database"
+            databasePort = 5432
+        }
 
-    app.databases.use(.postgres(
-        hostname: Environment.get("DATABASE_HOST") ?? "localhost",
-        port: databasePort, // Environment.get("DATABASE_PORT").flatMap(Int.init(_:)) ?? PostgresConfiguration.ianaPortNumber
-        username: Environment.get("DATABASE_USERNAME") ?? "root",
-        password: Environment.get("DATABASE_PASSWORD") ?? "password",
-        database: databaseName // Environment.get("DATABASE_NAME") ?? databaseName
-    ), as: .psql)
+        app.databases.use(.postgres(
+            hostname: Environment.get("DATABASE_HOST") ?? "localhost",
+            port: databasePort, // Environment.get("DATABASE_PORT").flatMap(Int.init(_:)) ?? PostgresConfiguration.ianaPortNumber
+            username: Environment.get("DATABASE_USERNAME") ?? "root",
+            password: Environment.get("DATABASE_PASSWORD") ?? "password",
+            database: databaseName // Environment.get("DATABASE_NAME") ?? databaseName
+        ), as: .psql)
+        
+    }
     
     
     app.migrations.add(CreateUser())
@@ -59,7 +66,7 @@ public func configure(_ app: Application) throws {
 //    app.jwt.signers.use(publicSigner, kid: .public, isDefault: true)
     
     
-    app.jwt.signers.use(.hs256(key: "secret"))
+    app.jwt.signers.use(.hs256(key: Environment.get("JWT_SECRET")!))
 
     // register routes
     try routes(app)
