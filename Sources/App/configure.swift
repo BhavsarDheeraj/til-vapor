@@ -52,9 +52,7 @@ public func configure(_ app: Application) throws {
     app.logger.logLevel = .debug
     
     try app.autoMigrate().wait()
-    
-    app.http.server.configuration.port = Int(Environment.get("PORT") ?? "8000" ) ?? 8000
-    
+        
     // Configure
 //    let privateKey = try String(contentsOfFile: "/Users/mobcast/Developer/vapor/TILApp/jwt.key")
 //    let privateSigner = try JWTSigner.rs256(key: .private(pem: privateKey.bytes))
