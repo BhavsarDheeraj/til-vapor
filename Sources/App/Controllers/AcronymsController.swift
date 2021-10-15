@@ -33,10 +33,14 @@ struct AcronymsController: RouteCollection {
             .map{ acronym }
     }
     
-    func getHandler(_ req: Request) throws -> EventLoopFuture<Acronym> {
-        return Acronym
-            .find(req.parameters.get("acronymID"), on: req.db)
-            .unwrap(or: Abort(.notFound))
+    func getHandler(_ req: Request) async throws -> EventLoopFuture<Acronym> {
+        guard let acronym = try await Acronym.find(req.parameters.get("acronymID"), on: req.db) else {
+            throw Abort(.notFound)
+        }
+        return acronym
+//        return Acronym
+//            .find(req.parameters.get("acronymID"), on: req.db)
+//            .unwrap(or: Abort(.notFound))
     }
     
     func updateHandler(_ req: Request) throws -> EventLoopFuture<Acronym> {
