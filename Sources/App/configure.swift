@@ -18,8 +18,12 @@ public func configure(_ app: Application) throws {
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
     
     
-    if let url = Environment.get("DATABASE_URL") {
-        try app.databases.use(.postgres(url: url), as: .psql)
+    if let databaseURL = Environment.get("DATABASE_URL"), var postgresConfig = PostgresConfiguration(url: databaseURL) {
+        postgresConfig.tlsConfiguration = .makeClientConfiguration() // .forClient(certificateVerification: .none)
+        postgresConfig.tlsConfiguration?.certificateVerification = .none
+        app.databases.use(.postgres(
+            configuration: postgresConfig
+        ), as: .psql)
     } else {
         
         let databaseName: String
